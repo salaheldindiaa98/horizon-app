@@ -1,0 +1,102 @@
+name: Build Horizon APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm packages
+        run: npm ci
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Copy widget layout
+        run: |
+          mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/res/xml
+          cp widget_files/widget_horizon.xml android/app/src/main/res/layout/widget_horizon.xml
+          cp widget_files/widget_info.xml android/app/src/main/res/xml/widget_info.xml
+
+      - name: Copy widget Java class
+        run: |
+          mkdir -p android/app/src/main/java/com/salah/horizon
+          cp widget_files/HorizonWidget.java android/app/src/main/java/com/salah/horizon/HorizonWidget.java
+
+      - name: Add widget and permissions to AndroidManifest
+        run: |
+          python3 << 'PYEOF'
+          with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
+              content = f.read()
+
+          # Add permissions if not already present
+          permissions = '''    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+                permissions = """    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+          <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+          <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+          <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>"""
+
+          if 'POST_NOTIFICATIONS' not in content:
+              content = content.replace('<application', permissions + '\n\n    <application', 1)
+
+          # Add widget receiver
+          widget_receiver = '''
+          <receiver
+              android:name=".HorizonWidget"
+              android:exported="true">
+              <intent-filter>
+                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+              </intent-filter>
+              <meta-data
+                  android:name="android.appwidget.provider"
+                  android:resource="@xml/widget_info" />
+          </receiver>'''
+
+          if 'HorizonWidget' not in content:
+              content = content.replace('</application>', widget_receiver + '\n    </application>', 1)
+
+          with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
+              f.write(content)
+
+          print("AndroidManifest.xml updated successfully")
+          PYEOF
+
+      - name: Sync web assets into Android
+        run: npx cap sync android
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Horizon-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
