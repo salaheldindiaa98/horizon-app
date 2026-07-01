@@ -36,43 +36,15 @@ jobs:
           mkdir -p android/app/src/main/java/com/salah/horizon
           cp widget_files/HorizonWidget.java android/app/src/main/java/com/salah/horizon/HorizonWidget.java
 
-      - name: Add widget and permissions to AndroidManifest
+      - - name: Add widget and permissions to AndroidManifest
         run: |
-          python3 << 'PYEOF'
-          with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
-              content = f.read()
-
-          # Add permissions if not already present
-          permissions = '''    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-                permissions = """    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-          <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-          <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
-          <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>"""
-
-          if 'POST_NOTIFICATIONS' not in content:
-              content = content.replace('<application', permissions + '\n\n    <application', 1)
-
-          # Add widget receiver
-          widget_receiver = '''
-          <receiver
-              android:name=".HorizonWidget"
-              android:exported="true">
-              <intent-filter>
-                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-              </intent-filter>
-              <meta-data
-                  android:name="android.appwidget.provider"
-                  android:resource="@xml/widget_info" />
-          </receiver>'''
-
-          if 'HorizonWidget' not in content:
-              content = content.replace('</application>', widget_receiver + '\n    </application>', 1)
-
-          with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
-              f.write(content)
-
-          print("AndroidManifest.xml updated successfully")
-          PYEOF
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          
+          # Add permissions before <application
+          sed -i 's|<application|<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n\n    <application|' "$MANIFEST"
+          
+          # Add widget receiver before </application>
+          sed -i 's|</application>|    <receiver android:name=".HorizonWidget" android:exported="true"><intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter><meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info"/></receiver>\n    </application>|' "$MANIFEST"
 
       - name: Sync web assets into Android
         run: npx cap sync android
