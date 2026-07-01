@@ -1,4 +1,4 @@
-name: Build Horizon APK
+name: Build Horizon APk
 
 on:
   push:
