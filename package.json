@@ -1,0 +1,17 @@
+{
+  "name": "horizon-app",
+  "version": "1.0.0",
+  "description": "Horizon countdown and calendar app",
+  "scripts": {
+    "build": "echo No build step needed"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/local-notifications": "^6.0.0",
+    "@capacitor/preferences": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
