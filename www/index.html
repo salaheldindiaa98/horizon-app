@@ -582,7 +582,71 @@ git clone https://github.com/salaheldindiaa98/horizon-app.git
 <h2>Step 4.2 — Find the saveData function</h2>
 <p>Press <code>Ctrl + W</code>, type <code>function saveData</code>, press Enter.</p>
 <p>You should land on this line:</p>
-<pre><code class="language-javascript">function saveData(){ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+<p> function saveData(){
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  updateWidgetData();
+  rescheduleAllNotifications();
+}
+
+async function updateWidgetData(){
+  if(!window.Capacitor?.isNativePlatform()) return;
+  try {
+    const { Preferences } = window.Capacitor.Plugins;
+    const all = getOrderedEvents();
+    const featured = all.find(e=>e.featured) || all[0];
+    if(!featured) return;
+    const target = combinedDate(featured);
+    await Preferences.set({
+      key: 'featured_event',
+      value: JSON.stringify({ name: featured.name, targetMs: target.getTime() })
+    });
+  } catch(e){ console.warn('Widget update failed:', e); }
+}
+
+async function rescheduleAllNotifications(){
+  if(!window.Capacitor?.isNativePlatform()) return;
+  try {
+    const { LocalNotifications } = window.Capacitor.Plugins;
+    const perm = await LocalNotifications.requestPermissions();
+    if(perm.display !== 'granted') return;
+    // Cancel all pending notifications then reschedule
+    const pending = await LocalNotifications.getPending();
+    if(pending.notifications.length > 0){
+      await LocalNotifications.cancel({ notifications: pending.notifications });
+    }
+    const toSchedule = [];
+    const now = new Date();
+    data.events.forEach(ev => {
+      (ev.reminders || []).forEach((minsBefore, idx) => {
+        const target = combinedDate(ev);
+        const fireAt = new Date(target.getTime() - minsBefore * 60000);
+        if(fireAt > now){
+          const label = minsBefore === 0 ? 'is now!' :
+            minsBefore < 60 ? `in ${minsBefore} minutes` :
+            minsBefore < 1440 ? `in ${Math.round(minsBefore/60)} hours` :
+            `tomorrow`;
+          toSchedule.push({
+            title: '⏱ ' + ev.name,
+            body: ev.name + ' ' + label,
+            id: Math.abs(simpleHash(ev.id + '_' + idx)) % 2000000000,
+            schedule: { at: fireAt, allowWhileIdle: true },
+            sound: 'default',
+            channelId: 'horizon_reminders'
+          });
+        }
+      });
+    });
+    if(toSchedule.length > 0){
+      await LocalNotifications.schedule({ notifications: toSchedule });
+    }
+  } catch(e){ console.warn('Notification scheduling failed:', e); }
+}
+
+function simpleHash(str){
+  let h = 0;
+  for(let i = 0; i < str.length; i++){ h = Math.imul(31, h) + str.charCodeAt(i) | 0; }
+  return h;
+}
 </code></pre>
 <hr />
 <h2>Step 4.3 — Replace it with the Capacitor-aware version</h2>
