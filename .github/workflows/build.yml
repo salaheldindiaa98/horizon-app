@@ -36,7 +36,7 @@ jobs:
           mkdir -p android/app/src/main/java/com/salah/horizon
           cp widget_files/HorizonWidget.java android/app/src/main/java/com/salah/horizon/HorizonWidget.java
 
-      - - name: Add widget and permissions to AndroidManifest
+      - name: Add widget and permissions to AndroidManifest
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           
