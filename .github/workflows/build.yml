@@ -19,7 +19,7 @@ jobs:
           node-version: '20'
 
       - name: Install npm packages
-        run: npm ci
+        run: npm ci install
 
       - name: Add Android platform
         run: npx cap add android
