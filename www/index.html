@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon — Android Build Tutorial</title>
+<style>
+  :root{
+    --bg:#0f1623; --card:#17213a; --amber:#f2a33c; --blue:#5fb3d9;
+    --text:#e9edf5; --dim:#8c97ad; --line:#243150; --danger:#e0654e;
+    --green:#5fd992;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:15px; line-height:1.7; padding:0 0 60px;}
+  .header{
+    background:linear-gradient(135deg,#121b2e,#0b1220);
+    border-bottom:1px solid var(--line);
+    padding:32px 20px 24px; text-align:center;
+  }
+  .header h1{font-size:26px; font-weight:800; color:var(--amber); margin-bottom:6px;}
+  .header p{color:var(--dim); font-size:13px;}
+  .content{max-width:680px; margin:0 auto; padding:0 16px;}
+  h1{font-size:22px; color:var(--amber); margin:36px 0 12px; padding-top:8px;}
+  h2{font-size:18px; color:var(--text); margin:28px 0 10px;
+    border-left:3px solid var(--amber); padding-left:12px;}
+  h3{font-size:15px; color:var(--blue); margin:20px 0 8px; font-weight:700;}
+  p{margin:10px 0; color:var(--text);}
+  ul,ol{margin:10px 0 10px 22px;}
+  li{margin:6px 0;}
+  pre{
+    background:#0b1220; border:1px solid var(--line); border-radius:12px;
+    padding:16px; margin:14px 0; overflow-x:auto;
+  }
+  code{
+    font-family:'SF Mono',ui-monospace,'Roboto Mono',monospace;
+    font-size:13px; color:var(--green);
+  }
+  p code, li code{
+    background:rgba(95,217,146,0.1); border:1px solid rgba(95,217,146,0.2);
+    padding:2px 6px; border-radius:5px; font-size:12.5px; color:var(--green);
+  }
+  blockquote{
+    background:rgba(242,163,60,0.08); border-left:3px solid var(--amber);
+    border-radius:0 10px 10px 0; padding:12px 16px; margin:14px 0;
+    color:var(--dim);
+  }
+  blockquote p{color:var(--dim); margin:0;}
+  blockquote strong{color:var(--amber);}
+  hr{border:none; border-top:1px solid var(--line); margin:32px 0;}
+  table{width:100%; border-collapse:collapse; margin:16px 0;}
+  th{background:var(--card); color:var(--amber); padding:10px 12px;
+    font-size:12px; text-transform:uppercase; letter-spacing:0.06em;
+    border:1px solid var(--line); text-align:left;}
+  td{padding:10px 12px; border:1px solid var(--line); font-size:13.5px;}
+  tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+  .phase-banner{
+    background:linear-gradient(135deg,var(--card),#0e1929);
+    border:1px solid var(--line); border-radius:16px;
+    padding:18px 20px; margin:28px 0 20px;
+    border-left:4px solid var(--amber);
+  }
+  .phase-banner h1{margin:0; padding:0; font-size:20px;}
+  .checklist li{list-style:none; margin-left:-22px; padding-left:28px; position:relative;}
+  .checklist li::before{content:'☐'; position:absolute; left:0; color:var(--amber);}
+  strong{color:var(--text); font-weight:700;}
+  em{color:var(--dim);}
+  a{color:var(--blue); text-decoration:none;}
+  .toc{background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:18px 20px; margin:20px 0;}
+  .toc h3{color:var(--amber); margin:0 0 12px; font-size:14px;
+    text-transform:uppercase; letter-spacing:0.1em;}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>⏱ Horizon</h1>
+  <p>Native Android Build Guide · salaheldindiaa98</p>
+</div>
+<div class="content">
+<h1>Horizon — Build Your Native Android App</h1>
+<h3>Complete Step-by-Step Guide (No PC Required)</h3>
+<p><strong>For: salaheldindiaa98 · Android 14 · First-time Termux user</strong></p>
+<hr />
+<blockquote>
+<p><strong>How to use this guide:</strong>
+Keep it open on a second browser tab while you work.
+Every command you need to type is in a <strong>grey code box</strong>.
+Copy it exactly — spelling and spacing matter.
+If something goes wrong, there is a <strong>Troubleshooting</strong> section at the end.</p>
+</blockquote>
+<hr />
+<h2>What You Will End Up With</h2>
+<ul>
+<li>A real <code>.apk</code> file installed on your phone</li>
+<li>Horizon opens full-screen with no browser bar, like a native app</li>
+<li>Notifications and alarms fire even when the app is closed</li>
+<li>A home screen widget showing your featured event countdown</li>
+<li>To update the app in future: change <code>index.html</code> on GitHub, re-download the APK</li>
+</ul>
+<p><strong>Total time:</strong> ~90 minutes the first time (30 of those is just waiting for the cloud to build)</p>
+<hr />
+<h2>Before You Start — What You Need</h2>
+<ul>
+<li>[ ] Your phone (Android 14), charged and on Wi-Fi</li>
+<li>[ ] Your GitHub account: <code>salaheldindiaa98</code></li>
+<li>[ ] The latest <code>index.html</code> of Horizon (downloaded from Claude)</li>
+<li>[ ] About 300 MB of free storage on your phone</li>
+</ul>
+<hr />
+<hr />
+<h1>PHASE 1 — Create Your GitHub Repository</h1>
+<h3>(Do this from your phone's browser — 10 minutes)</h3>
+<hr />
+<h2>Step 1.1 — Create a new repository</h2>
+<ol>
+<li>Open Chrome and go to <strong>github.com</strong></li>
+<li>Log in as <code>salaheldindiaa98</code></li>
+<li>Tap the <strong>+</strong> icon (top right) → <strong>New repository</strong></li>
+<li>Fill in:</li>
+<li><strong>Repository name:</strong> <code>horizon-app</code></li>
+<li><strong>Description:</strong> <code>Horizon countdown and calendar app</code></li>
+<li><strong>Visibility:</strong> Private (recommended) or Public — your choice</li>
+<li><strong>✅ Check:</strong> "Add a README file"</li>
+<li>Tap <strong>Create repository</strong></li>
+</ol>
+<hr />
+<h2>Step 1.2 — Create the folder structure</h2>
+<p>You will create three folders and upload files into them.</p>
+<h3>Create the <code>www</code> folder with Horizon's HTML:</h3>
+<ol>
+<li>In your new repo, tap <strong>Add file → Create new file</strong></li>
+<li>In the filename box type: <code>www/index.html</code>
+   <em>(typing the <code>/</code> automatically creates the folder)</em></li>
+<li><strong>Delete everything</strong> in the editor box</li>
+<li>Open the <code>index.html</code> file Claude gave you, select all the text, copy it</li>
+<li>Paste it into the GitHub editor</li>
+<li>Scroll down → tap <strong>Commit new file</strong></li>
+</ol>
+<h3>Create the widget layout file:</h3>
+<ol>
+<li>Tap <strong>Add file → Create new file</strong></li>
+<li>Filename: <code>widget_files/widget_horizon.xml</code></li>
+<li>Paste this exactly:</li>
+</ol>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot;
+    android:background=&quot;#0B1220&quot;
+    android:padding=&quot;16dp&quot;
+    android:gravity=&quot;center_vertical&quot;&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/widget_label&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;NEXT EVENT&quot;
+        android:textColor=&quot;#8C97AD&quot;
+        android:textSize=&quot;10sp&quot;
+        android:letterSpacing=&quot;0.12&quot;
+        android:textAllCaps=&quot;true&quot; /&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/widget_event_name&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;No events yet&quot;
+        android:textColor=&quot;#E9EDF5&quot;
+        android:textSize=&quot;15sp&quot;
+        android:fontFamily=&quot;sans-serif-medium&quot;
+        android:maxLines=&quot;1&quot;
+        android:ellipsize=&quot;end&quot;
+        android:layout_marginTop=&quot;4dp&quot; /&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/widget_countdown&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;-- d  -- h  -- m&quot;
+        android:textColor=&quot;#F2A33C&quot;
+        android:textSize=&quot;24sp&quot;
+        android:fontFamily=&quot;monospace&quot;
+        android:layout_marginTop=&quot;6dp&quot; /&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/widget_date&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;&quot;
+        android:textColor=&quot;#8C97AD&quot;
+        android:textSize=&quot;11sp&quot;
+        android:layout_marginTop=&quot;3dp&quot; /&gt;
+
+&lt;/LinearLayout&gt;
+</code></pre>
+<ol>
+<li>Tap <strong>Commit new file</strong></li>
+</ol>
+<h3>Create the widget info file:</h3>
+<ol>
+<li>Tap <strong>Add file → Create new file</strong></li>
+<li>Filename: <code>widget_files/widget_info.xml</code></li>
+<li>Paste this:</li>
+</ol>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;appwidget-provider
+    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:initialLayout=&quot;@layout/widget_horizon&quot;
+    android:minWidth=&quot;250dp&quot;
+    android:minHeight=&quot;110dp&quot;
+    android:resizeMode=&quot;horizontal|vertical&quot;
+    android:updatePeriodMillis=&quot;1800000&quot;
+    android:widgetCategory=&quot;home_screen&quot;
+    android:description=&quot;@string/app_name&quot; /&gt;
+</code></pre>
+<ol>
+<li>Tap <strong>Commit new file</strong></li>
+</ol>
+<h3>Create the widget Java file:</h3>
+<ol>
+<li>Tap <strong>Add file → Create new file</strong></li>
+<li>Filename: <code>widget_files/HorizonWidget.java</code></li>
+<li>Paste this:</li>
+</ol>
+<pre><code class="language-java">package com.salah.horizon;
+
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.widget.RemoteViews;
+import org.json.JSONObject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class HorizonWidget extends AppWidgetProvider {
+
+    @Override
+    public void onUpdate(Context context, AppWidgetManager mgr, int[] ids) {
+        for (int id : ids) updateWidget(context, mgr, id);
+    }
+
+    static void updateWidget(Context context, AppWidgetManager mgr, int id) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_horizon);
+        try {
+            // Try both SharedPreference store names Capacitor may use
+            SharedPreferences prefs = context.getSharedPreferences(&quot;CAPStorage&quot;, Context.MODE_PRIVATE);
+            String json = prefs.getString(&quot;featured_event&quot;, null);
+            if (json == null) {
+                prefs = context.getSharedPreferences(&quot;CapacitorStorage&quot;, Context.MODE_PRIVATE);
+                json = prefs.getString(&quot;featured_event&quot;, null);
+            }
+            if (json != null) {
+                JSONObject ev = new JSONObject(json);
+                String name = ev.getString(&quot;name&quot;);
+                long targetMs = ev.getLong(&quot;targetMs&quot;);
+                long diff = targetMs - System.currentTimeMillis();
+                views.setTextViewText(R.id.widget_event_name, name);
+                if (diff &gt; 0) {
+                    long d = diff / 86400000L;
+                    long h = (diff % 86400000L) / 3600000L;
+                    long m = (diff % 3600000L) / 60000L;
+                    views.setTextViewText(R.id.widget_countdown, d + &quot;d  &quot; + h + &quot;h  &quot; + m + &quot;m&quot;);
+                    String date = new SimpleDateFormat(&quot;MMM d, yyyy&quot;, Locale.getDefault())
+                            .format(new Date(targetMs));
+                    views.setTextViewText(R.id.widget_date, date);
+                } else {
+                    views.setTextViewText(R.id.widget_countdown, &quot;Has passed&quot;);
+                    views.setTextViewText(R.id.widget_date, &quot;&quot;);
+                }
+            } else {
+                views.setTextViewText(R.id.widget_event_name, &quot;Open Horizon to load&quot;);
+                views.setTextViewText(R.id.widget_countdown, &quot;&quot;);
+                views.setTextViewText(R.id.widget_date, &quot;&quot;);
+            }
+        } catch (Exception e) {
+            views.setTextViewText(R.id.widget_event_name, &quot;Horizon&quot;);
+            views.setTextViewText(R.id.widget_countdown, &quot;Tap to open app&quot;);
+            views.setTextViewText(R.id.widget_date, &quot;&quot;);
+        }
+        mgr.updateAppWidget(id, views);
+    }
+}
+</code></pre>
+<ol>
+<li>Tap <strong>Commit new file</strong></li>
+</ol>
+<hr />
+<h2>Step 1.3 — Create the Capacitor config file</h2>
+<ol>
+<li>Tap <strong>Add file → Create new file</strong></li>
+<li>Filename: <code>capacitor.config.json</code></li>
+<li>Paste this:</li>
+</ol>
+<pre><code class="language-json">{
+  &quot;appId&quot;: &quot;com.salah.horizon&quot;,
+  &quot;appName&quot;: &quot;Horizon&quot;,
+  &quot;webDir&quot;: &quot;www&quot;,
+  &quot;server&quot;: {
+    &quot;androidScheme&quot;: &quot;https&quot;
+  },
+  &quot;plugins&quot;: {
+    &quot;LocalNotifications&quot;: {
+      &quot;smallIcon&quot;: &quot;ic_stat_icon_config_sample&quot;,
+      &quot;iconColor&quot;: &quot;#F2A33C&quot;,
+      &quot;sound&quot;: &quot;beep.wav&quot;
+    }
+  }
+}
+</code></pre>
+<ol>
+<li>Tap <strong>Commit new file</strong></li>
+</ol>
+<hr />
+<h2>Step 1.4 — Create the package.json file</h2>
+<ol>
+<li>Tap <strong>Add file → Create new file</strong></li>
+<li>Filename: <code>package.json</code></li>
+<li>Paste this:</li>
+</ol>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;horizon-app&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;Horizon countdown and calendar app&quot;,
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;echo No build step needed&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;@capacitor/android&quot;: &quot;^6.0.0&quot;,
+    &quot;@capacitor/core&quot;: &quot;^6.0.0&quot;,
+    &quot;@capacitor/local-notifications&quot;: &quot;^6.0.0&quot;,
+    &quot;@capacitor/preferences&quot;: &quot;^6.0.0&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;@capacitor/cli&quot;: &quot;^6.0.0&quot;
+  }
+}
+</code></pre>
+<ol>
+<li>Tap <strong>Commit new file</strong></li>
+</ol>
+<hr />
+<h2>Step 1.5 — Create the GitHub Actions workflow</h2>
+<p>This is the file that tells GitHub's cloud computers how to build your APK automatically every time you make a change.</p>
+<ol>
+<li>Tap <strong>Add file → Create new file</strong></li>
+<li>Filename: <code>.github/workflows/build.yml</code>
+   <em>(the dot at the start is required)</em></li>
+<li>Paste this:</li>
+</ol>
+<pre><code class="language-yaml">name: Build Horizon APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm packages
+        run: npm ci
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Copy widget layout
+        run: |
+          mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/res/xml
+          cp widget_files/widget_horizon.xml android/app/src/main/res/layout/widget_horizon.xml
+          cp widget_files/widget_info.xml android/app/src/main/res/xml/widget_info.xml
+
+      - name: Copy widget Java class
+        run: |
+          mkdir -p android/app/src/main/java/com/salah/horizon
+          cp widget_files/HorizonWidget.java android/app/src/main/java/com/salah/horizon/HorizonWidget.java
+
+      - name: Add widget and permissions to AndroidManifest
+        run: |
+          python3 &lt;&lt; 'PYEOF'
+          with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
+              content = f.read()
+
+          # Add permissions if not already present
+          permissions = '''    &lt;uses-permission android:name=&quot;android.permission.POST_NOTIFICATIONS&quot;/&gt;
+      &lt;uses-permission android:name=&quot;android.permission.SCHEDULE_EXACT_ALARM&quot;/&gt;
+      &lt;uses-permission android:name=&quot;android.permission.USE_EXACT_ALARM&quot;/&gt;
+      &lt;uses-permission android:name=&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;/&gt;'''
+
+          if 'POST_NOTIFICATIONS' not in content:
+              content = content.replace('&lt;application', permissions + '\n\n    &lt;application', 1)
+
+          # Add widget receiver
+          widget_receiver = '''
+          &lt;receiver
+              android:name=&quot;.HorizonWidget&quot;
+              android:exported=&quot;true&quot;&gt;
+              &lt;intent-filter&gt;
+                  &lt;action android:name=&quot;android.appwidget.action.APPWIDGET_UPDATE&quot; /&gt;
+              &lt;/intent-filter&gt;
+              &lt;meta-data
+                  android:name=&quot;android.appwidget.provider&quot;
+                  android:resource=&quot;@xml/widget_info&quot; /&gt;
+          &lt;/receiver&gt;'''
+
+          if 'HorizonWidget' not in content:
+              content = content.replace('&lt;/application&gt;', widget_receiver + '\n    &lt;/application&gt;', 1)
+
+          with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
+              f.write(content)
+
+          print(&quot;AndroidManifest.xml updated successfully&quot;)
+          PYEOF
+
+      - name: Sync web assets into Android
+        run: npx cap sync android
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Horizon-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+</code></pre>
+<ol>
+<li>Tap <strong>Commit new file</strong></li>
+</ol>
+<blockquote>
+<p><strong>What just happened?</strong> You now have a complete project on GitHub. Every time you push a change, GitHub's cloud servers will automatically build a fresh APK for you. The first build takes about 15–25 minutes.</p>
+</blockquote>
+<hr />
+<h2>Step 1.6 — Watch your first build</h2>
+<ol>
+<li>On your repo page, tap the <strong>Actions</strong> tab</li>
+<li>You should see a workflow run called <strong>"Build Horizon APK"</strong> — it starts automatically when you committed files</li>
+<li>Tap it to watch the progress</li>
+<li>While it runs, continue to Phase 2 in Termux</li>
+</ol>
+<blockquote>
+<p>If it shows a red ❌, tap the failed step to read the error. Most common fix is in the Troubleshooting section at the end of this document.</p>
+</blockquote>
+<hr />
+<hr />
+<h1>PHASE 2 — Install and Set Up Termux</h1>
+<h3>(15 minutes)</h3>
+<hr />
+<h2>Step 2.1 — Install Termux from F-Droid</h2>
+<blockquote>
+<p>⚠️ <strong>Important:</strong> Do NOT install Termux from the Google Play Store. That version is outdated and broken. You must use F-Droid.</p>
+</blockquote>
+<ol>
+<li>Open Chrome, go to: <strong>f-droid.org</strong></li>
+<li>Tap the big <strong>Download F-Droid</strong> button</li>
+<li>When the download finishes, tap the notification to install</li>
+<li>If asked, tap <strong>Settings</strong> → enable "Install unknown apps" for Chrome → go back and install</li>
+<li>Open F-Droid</li>
+<li>Wait for it to update its app list (1–2 minutes)</li>
+<li>Search for <strong>Termux</strong></li>
+<li>Install <strong>Termux</strong> (by Fredrik Fornwall)</li>
+<li>Also install <strong>Termux:Widget</strong> (you'll need this later for the widget)</li>
+</ol>
+<hr />
+<h2>Step 2.2 — First launch and storage permission</h2>
+<ol>
+<li>Open Termux</li>
+<li>You will see a black screen with a <code>$</code> prompt — this is normal</li>
+<li>Give Termux storage access by running:</li>
+</ol>
+<pre><code class="language-bash">termux-setup-storage
+</code></pre>
+<ol>
+<li>When prompted, tap <strong>Allow</strong></li>
+</ol>
+<hr />
+<h2>Step 2.3 — Update Termux packages</h2>
+<p>Run this command (it will take 2–5 minutes, say <strong>Y</strong> if asked any questions):</p>
+<pre><code class="language-bash">pkg update &amp;&amp; pkg upgrade -y
+</code></pre>
+<hr />
+<h2>Step 2.4 — Install required tools</h2>
+<p>Run these one at a time. Wait for each to finish before running the next:</p>
+<pre><code class="language-bash">pkg install -y git
+</code></pre>
+<pre><code class="language-bash">pkg install -y nodejs-lts
+</code></pre>
+<pre><code class="language-bash">pkg install -y nano
+</code></pre>
+<p>Verify everything installed by running:</p>
+<pre><code class="language-bash">node --version
+git --version
+</code></pre>
+<p>You should see version numbers (like <code>v20.x.x</code> and <code>git version 2.x.x</code>). If you do, you're ready.</p>
+<hr />
+<hr />
+<h1>PHASE 3 — Set Up Git Authentication</h1>
+<h3>(10 minutes)</h3>
+<p>You need to give Termux permission to push files to your GitHub account. You do this with a <strong>Personal Access Token</strong> — a long password GitHub generates for you.</p>
+<hr />
+<h2>Step 3.1 — Create a Personal Access Token on GitHub</h2>
+<ol>
+<li>Open Chrome, go to: <strong>github.com/settings/tokens</strong></li>
+<li>Tap <strong>Generate new token → Generate new token (classic)</strong></li>
+<li>Fill in:</li>
+<li><strong>Note:</strong> <code>Termux Horizon</code></li>
+<li><strong>Expiration:</strong> <code>90 days</code> (or No expiration if you prefer)</li>
+<li><strong>Scopes:</strong> Check the box next to <strong>repo</strong> (this automatically checks everything under it)</li>
+<li>Tap <strong>Generate token</strong></li>
+<li><strong>⚠️ Copy the token NOW</strong> — it looks like <code>ghp_xxxxxxxxxxxx</code> — you won't see it again</li>
+<li>Paste it somewhere safe temporarily (Notes app on your phone)</li>
+</ol>
+<hr />
+<h2>Step 3.2 — Configure Git in Termux</h2>
+<p>Back in Termux, run these (replace with your real email):</p>
+<pre><code class="language-bash">git config --global user.name &quot;salaheldindiaa98&quot;
+</code></pre>
+<pre><code class="language-bash">git config --global user.email &quot;your-email@example.com&quot;
+</code></pre>
+<pre><code class="language-bash">git config --global credential.helper store
+</code></pre>
+<hr />
+<h2>Step 3.3 — Clone your repository</h2>
+<pre><code class="language-bash">cd ~
+git clone https://github.com/salaheldindiaa98/horizon-app.git
+</code></pre>
+<p>When prompted:
+- <strong>Username:</strong> <code>salaheldindiaa98</code>
+- <strong>Password:</strong> paste your Personal Access Token (not your GitHub password — the <code>ghp_xxx</code> token)</p>
+<p>After cloning, move into the project folder:</p>
+<pre><code class="language-bash">cd horizon-app
+</code></pre>
+<p>Your token is now saved and you won't need to enter it again.</p>
+<hr />
+<hr />
+<h1>PHASE 4 — Update Horizon to Support Notifications and Widget</h1>
+<h3>(10 minutes)</h3>
+<p>The Horizon app you built with Claude stores reminder times but doesn't yet fire real notifications. You need to add a small piece of code to <code>www/index.html</code> that talks to Android's notification system via Capacitor.</p>
+<hr />
+<h2>Step 4.1 — Open index.html in the nano editor</h2>
+<pre><code class="language-bash">nano www/index.html
+</code></pre>
+<p>This opens the file in a text editor inside Termux.</p>
+<blockquote>
+<p><strong>How to use nano:</strong>
+- Arrow keys to move around
+- You cannot tap to place the cursor — use arrows only
+- <code>Ctrl + W</code> = search for text
+- <code>Ctrl + X</code> = exit (it will ask to save → press <code>Y</code> then <code>Enter</code>)</p>
+</blockquote>
+<hr />
+<h2>Step 4.2 — Find the saveData function</h2>
+<p>Press <code>Ctrl + W</code>, type <code>function saveData</code>, press Enter.</p>
+<p>You should land on this line:</p>
+<pre><code class="language-javascript">function saveData(){ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+</code></pre>
+<hr />
+<h2>Step 4.3 — Replace it with the Capacitor-aware version</h2>
+<p>Delete that line and replace it with:</p>
+<pre><code class="language-javascript">function saveData(){
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  updateWidgetData();
+  rescheduleAllNotifications();
+}
+
+async function updateWidgetData(){
+  if(!window.Capacitor?.isNativePlatform()) return;
+  try {
+    const { Preferences } = window.Capacitor.Plugins;
+    const all = getOrderedEvents();
+    const featured = all.find(e=&gt;e.featured) || all[0];
+    if(!featured) return;
+    const target = combinedDate(featured);
+    await Preferences.set({
+      key: 'featured_event',
+      value: JSON.stringify({ name: featured.name, targetMs: target.getTime() })
+    });
+  } catch(e){ console.warn('Widget update failed:', e); }
+}
+
+async function rescheduleAllNotifications(){
+  if(!window.Capacitor?.isNativePlatform()) return;
+  try {
+    const { LocalNotifications } = window.Capacitor.Plugins;
+    const perm = await LocalNotifications.requestPermissions();
+    if(perm.display !== 'granted') return;
+    // Cancel all pending notifications then reschedule
+    const pending = await LocalNotifications.getPending();
+    if(pending.notifications.length &gt; 0){
+      await LocalNotifications.cancel({ notifications: pending.notifications });
+    }
+    const toSchedule = [];
+    const now = new Date();
+    data.events.forEach(ev =&gt; {
+      (ev.reminders || []).forEach((minsBefore, idx) =&gt; {
+        const target = combinedDate(ev);
+        const fireAt = new Date(target.getTime() - minsBefore * 60000);
+        if(fireAt &gt; now){
+          const label = minsBefore === 0 ? 'is now!' :
+            minsBefore &lt; 60 ? `in ${minsBefore} minutes` :
+            minsBefore &lt; 1440 ? `in ${Math.round(minsBefore/60)} hours` :
+            `tomorrow`;
+          toSchedule.push({
+            title: '⏱ ' + ev.name,
+            body: ev.name + ' ' + label,
+            id: Math.abs(simpleHash(ev.id + '_' + idx)) % 2000000000,
+            schedule: { at: fireAt, allowWhileIdle: true },
+            sound: 'default',
+            channelId: 'horizon_reminders'
+          });
+        }
+      });
+    });
+    if(toSchedule.length &gt; 0){
+      await LocalNotifications.schedule({ notifications: toSchedule });
+    }
+  } catch(e){ console.warn('Notification scheduling failed:', e); }
+}
+
+function simpleHash(str){
+  let h = 0;
+  for(let i = 0; i &lt; str.length; i++){ h = Math.imul(31, h) + str.charCodeAt(i) | 0; }
+  return h;
+}
+</code></pre>
+<hr />
+<h2>Step 4.4 — Save and exit nano</h2>
+<p>Press <code>Ctrl + X</code>, then <code>Y</code>, then <code>Enter</code>.</p>
+<hr />
+<hr />
+<h1>PHASE 5 — Push Everything to GitHub and Build</h1>
+<h3>(5 minutes + 20 minutes waiting)</h3>
+<hr />
+<h2>Step 5.1 — Push your changes</h2>
+<pre><code class="language-bash">cd ~/horizon-app
+git add .
+git commit -m &quot;Add Capacitor notifications and widget support&quot;
+git push
+</code></pre>
+<hr />
+<h2>Step 5.2 — Watch the build</h2>
+<ol>
+<li>Open Chrome → go to your repo → tap <strong>Actions</strong> tab</li>
+<li>You should see a new run starting: <strong>"Build Horizon APK"</strong></li>
+<li>Tap it → watch the steps run one by one</li>
+<li>The whole thing takes <strong>15–25 minutes</strong> the first time</li>
+</ol>
+<blockquote>
+<p>If you see a green ✅ — you're done, move to Phase 6.
+If you see a red ❌ — go to the Troubleshooting section.</p>
+</blockquote>
+<hr />
+<hr />
+<h1>PHASE 6 — Download and Install the APK</h1>
+<h3>(5 minutes)</h3>
+<hr />
+<h2>Step 6.1 — Download the APK</h2>
+<ol>
+<li>On the completed GitHub Actions run page, scroll to the bottom</li>
+<li>Under <strong>Artifacts</strong>, tap <strong>Horizon-APK</strong></li>
+<li>This downloads a ZIP file to your phone</li>
+<li>Open your <strong>Files</strong> app → Downloads → tap the ZIP → extract it</li>
+<li>Inside you will find <strong>app-debug.apk</strong></li>
+</ol>
+<hr />
+<h2>Step 6.2 — Install the APK</h2>
+<ol>
+<li>Tap <strong>app-debug.apk</strong></li>
+<li>Android will warn "Install unknown app" — tap <strong>Settings</strong></li>
+<li>Enable <strong>"Allow from this source"</strong> for your Files app</li>
+<li>Go back and tap <strong>Install</strong></li>
+<li>Tap <strong>Open</strong></li>
+</ol>
+<hr />
+<h2>Step 6.3 — Grant permissions when the app opens</h2>
+<p>The first time you open Horizon:</p>
+<ol>
+<li>It will ask for <strong>Notification permission</strong> — tap <strong>Allow</strong></li>
+<li>Go to your phone <strong>Settings → Apps → Horizon → Permissions</strong></li>
+<li>Make sure <strong>Notifications</strong> is set to <strong>Allowed</strong></li>
+<li>Tap <strong>Alarms &amp; Reminders</strong> → enable it</li>
+</ol>
+<blockquote>
+<p><strong>For Android 14 specifically:</strong> Go to <strong>Settings → Apps → Special app access → Alarms &amp; reminders → Horizon</strong> and turn it on. This is required for reminders to fire when the phone is locked.</p>
+</blockquote>
+<hr />
+<hr />
+<h1>PHASE 7 — Add the Home Screen Widget</h1>
+<h3>(2 minutes)</h3>
+<hr />
+<h2>Step 7.1 — Add widget to home screen</h2>
+<ol>
+<li>Long-press an empty area of your home screen</li>
+<li>Tap <strong>Widgets</strong></li>
+<li>Scroll or search for <strong>Horizon</strong></li>
+<li>Long-press the Horizon widget and drag it to your home screen</li>
+<li>Release to place it</li>
+</ol>
+<p>The widget will show "Open Horizon to load" until you open the app and have at least one event saved. After that it updates every 30 minutes automatically.</p>
+<blockquote>
+<p><strong>Note:</strong> Android limits widget refresh to every 30 minutes maximum to save battery. The widget will not tick in real-time — it shows the last saved state. Open the app for the live ticking countdown.</p>
+</blockquote>
+<hr />
+<hr />
+<h1>PHASE 8 — How to Update Horizon in the Future</h1>
+<h3>(10 minutes per update)</h3>
+<p>When you want to update the app (fix something, add a feature, etc.):</p>
+<h2>Option A — Edit on GitHub directly (easiest)</h2>
+<ol>
+<li>Open Chrome → go to your repo → open <code>www/index.html</code></li>
+<li>Tap the <strong>pencil ✏️ icon</strong> to edit</li>
+<li>Make your changes</li>
+<li>Tap <strong>Commit changes</strong></li>
+<li>Wait 20 minutes for GitHub Actions to build</li>
+<li>Download the new APK from Actions → Artifacts</li>
+<li>Install it (Android will update the existing app)</li>
+</ol>
+<h2>Option B — Edit in Termux, push to GitHub</h2>
+<pre><code class="language-bash">cd ~/horizon-app
+nano www/index.html
+# make changes, save with Ctrl+X
+git add www/index.html
+git commit -m &quot;Update Horizon&quot;
+git push
+</code></pre>
+<p>Then wait for the build and download the APK.</p>
+<hr />
+<hr />
+<h1>TROUBLESHOOTING</h1>
+<hr />
+<h2>Build failed — "Gradle build failed"</h2>
+<p>This is the most common error. Causes and fixes:</p>
+<p><strong>Fix 1:</strong> Tap <strong>Re-run all jobs</strong> in GitHub Actions — sometimes it's a temporary network error</p>
+<p><strong>Fix 2:</strong> Check that your <code>package.json</code> is exactly as written in Step 1.4 — even one missing comma breaks it</p>
+<p><strong>Fix 3:</strong> Check the exact error message in the failed step — tap the step to expand it. Look for the last line before the red error.</p>
+<hr />
+<h2>"npx cap add android" failed in the workflow</h2>
+<p>This means the <code>package.json</code> has an error or the npm install step failed. Check that <code>package.json</code> has no typos.</p>
+<hr />
+<h2>Widget shows "Open Horizon to load" even after opening the app</h2>
+<p>This means the Capacitor Preferences plugin isn't writing to the location the widget expects. Try this:</p>
+<ol>
+<li>Open Horizon → create or tap an event (this triggers <code>saveData</code>)</li>
+<li>Wait 30 minutes for the widget to refresh</li>
+<li>If still not working, go to your repo → <code>widget_files/HorizonWidget.java</code> → find the line <code>"CAPStorage"</code> and change it to <code>"CapacitorStorage"</code> → commit → rebuild → reinstall</li>
+</ol>
+<hr />
+<h2>Notifications are not firing</h2>
+<ol>
+<li>Go to <strong>Settings → Apps → Horizon → Notifications</strong> → make sure all notification categories are <strong>On</strong></li>
+<li>Go to <strong>Settings → Battery → Horizon</strong> → set to <strong>Unrestricted</strong> (very important on Android 14 — restricted mode kills background notifications)</li>
+<li>Go to <strong>Settings → Apps → Special app access → Alarms &amp; reminders → Horizon</strong> → turn <strong>On</strong></li>
+</ol>
+<hr />
+<h2>"Install blocked" when installing the APK</h2>
+<ol>
+<li>Go to <strong>Settings → Security → Install unknown apps</strong></li>
+<li>Find your file manager or browser → enable <strong>Allow from this source</strong></li>
+</ol>
+<hr />
+<h2>Termux says "command not found" for node or git</h2>
+<p>Re-run the install commands:</p>
+<pre><code class="language-bash">pkg install -y nodejs-lts git
+</code></pre>
+<hr />
+<h2>I made a mistake in nano and want to start over</h2>
+<p>Press <code>Ctrl + X</code> without saving (press <code>N</code> when asked to save). Then run:</p>
+<pre><code class="language-bash">git checkout www/index.html
+</code></pre>
+<p>This restores the original file from GitHub.</p>
+<hr />
+<hr />
+<h1>QUICK REFERENCE — Commands You'll Use Often</h1>
+<pre><code class="language-bash"># Go to your project
+cd ~/horizon-app
+
+# Pull latest changes from GitHub
+git pull
+
+# Push changes to GitHub (triggers a new build)
+git add .
+git commit -m &quot;Update&quot;
+git push
+
+# Edit the app
+nano www/index.html
+
+# Check git status
+git status
+</code></pre>
+<hr />
+<p><em>Built with Claude · Horizon v1.0 · salaheldindiaa98</em></p>
+</div>
+</body>
+  </html>
